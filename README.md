@@ -4,11 +4,14 @@ This is a set of MATLAB routines used to analyze fluorescent microscopy images o
 ## Required toolboxes (other versions likely work)
 
 MATLAB R2018b (version 9.5)
+
 Image Processing Toolbox (version 10.3)
+
 Statistics and Machine Learning Toolbox (version 11.4)
 
 ## Required accessory files (from mathworks file exchange)
 progressbar (fileexchange/6922-progressbar)
+
 uipickfiles (fileexchange/10867-uipickfiles-uigetfile-on-steroids)
 
 ## Required pre-processing
@@ -25,13 +28,18 @@ uipickfiles (fileexchange/10867-uipickfiles-uigetfile-on-steroids)
 # (optional) UMAP dimensionality reduction
 ## Required toolboxes (other versions likely work)
 Statistics and Machine Learning Toolbox (version 11.4)
+
 Curve Fitting Toolbox (version 3.5.8)
+
 Bioinformatics Toolbox (version 4.11)
 
 ## Required accessory files (from mathworks file exchange)
 histcn (fileexchange/23897-n-dimensional-histogram)
+
 umap (fileexchange/71902-uniform-manifold-approximation-and-projection-umap)
+
 uipickfiles (fileexchange/10867-uipickfiles-uigetfile-on-steroids)
+
 uiinspect (fileexchange/17935-uiinspect-display-methods-properties-callbacks-of-an-object)
 
 ## Basic operation
