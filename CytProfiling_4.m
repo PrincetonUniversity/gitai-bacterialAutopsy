@@ -96,9 +96,18 @@ for iiCondition = 1:numel(inputFolderPaths)
         contourFileName = contourFileList(iiFile).name;
         
         if isempty(contour_channel_name);
+            try
+                isUpperCaseC = false;
             splitNameAtColor = strsplit(contourFileName,'c=');
             splitNameAtColor = strsplit(splitNameAtColor{2});
             contour_channel_name = ['c=',splitNameAtColor{1}];
+            catch ME1 % case sensitive 'c'= vs 'C='
+                splitNameAtColor = strsplit(contourFileName,'C=');
+                splitNameAtColor = strsplit(splitNameAtColor{2});
+                contour_channel_name = ['C=',splitNameAtColor{1}];
+                isUpperCaseC = true;
+
+            end
         end
         matchesContourChannel = strfind(contourFileName,contour_channel_name);
         if isempty(matchesContourChannel)
@@ -111,16 +120,32 @@ for iiCondition = 1:numel(inputFolderPaths)
         %%
         tifStemSplit = strsplit(contourFileName,'_');
         tifStem = tifStemSplit{1};
-        for kk = 2:length(tifStemSplit)-2
-            tifStem = [tifStem,'_',tifStemSplit{kk}];
+        % for some historical data files, the 'contours' files do not
+        % include the date of the analysis in the file name, these need to
+        % be handled separately
+        if isempty(strfind(tifStemSplit{end-2},'='))
+            for kk = 2:length(tifStemSplit)-1
+                tifStem = [tifStem,'_',tifStemSplit{kk}];
+            end
+            tifStem = [tifStem,'_CONTOURS.mat'];
+        else
+            for kk = 2:length(tifStemSplit)-2
+                tifStem = [tifStem,'_',tifStemSplit{kk}];
+            end
         end
         tifStem = [tifStem,'.tif'];
         %% Get folderpath and file of each tif
-        c0TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=0'));
-        c1TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=1'));
-        c2TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=2'));
-        c3TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=3'));
-
+        if isUpperCaseC
+            c0TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'C=0'));
+            c1TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'C=1'));
+            c2TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'C=2'));
+            c3TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'C=3'));
+        else
+            c0TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=0'));
+            c1TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=1'));
+            c2TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=2'));
+            c3TifFile = fullfile(inputFolderPaths{iiCondition},strrep(tifStem,contour_channel_name,'c=3'));
+        end
         %% from contours to mask via inpolygon
         %Load image Size and initailize mask variable
         c0 = imread(c0TifFile);
@@ -130,10 +155,16 @@ for iiCondition = 1:numel(inputFolderPaths)
         [xx, yy] = meshgrid(1:size(c0,2), 1:size(c0,1));
         
         for iObject = 1:numel(tempLoad.frame(1).object)
-
-            imask = inpolygon(xx, yy, [tempLoad.frame.object(iObject).Xcont;...
+            if isfield(tempLoad.frame.object(iObject),'on_edge')
+                if tempLoad.frame.object(iObject).on_edge
+                    continue
+                end
+            end
+            
+            imask = inpolygon(xx, yy,...
+                [tempLoad.frame.object(iObject).Xcont(:);...
                 tempLoad.frame.object(iObject).Xcont(1)],...
-                [tempLoad.frame.object(iObject).Ycont;...
+                [tempLoad.frame.object(iObject).Ycont(:);...
                 tempLoad.frame.object(iObject).Ycont(1)]);
             mask = iObject*imask + mask;
         end
