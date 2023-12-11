@@ -94,6 +94,11 @@ for iiCondition = 1:numel(inputFolderPaths)
     for iiFile = 1:numel(contourFileList)
         % find the color channel specific name
         contourFileName = contourFileList(iiFile).name;
+
+        if strcmp(contourFileName(1:2),'._')
+            % skip if temporary or hidden file
+            continue
+        end
         
         if isempty(contour_channel_name);
             try
