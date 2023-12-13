@@ -92,6 +92,7 @@ for iiCondition = 1:numel(inputFolderPaths)
     contourFileList = dir([inputFolderPaths{iiCondition}, filesep, '*CONTOURS.mat']);
     
     for iiFile = 1:numel(contourFileList)
+        try
         % find the color channel specific name
         contourFileName = contourFileList(iiFile).name;
 
@@ -484,6 +485,13 @@ for iiCondition = 1:numel(inputFolderPaths)
         clear T_treat
         
         C = vertcat(C, C_temp);
+        catch ME
+            % display specific file with error
+            disp(['Error processing ''',contourFileList(iiFile).name,'''']);
+            disp(ME.message);
+%             rethrow(ME);
+        end
+    
     end
 end
 % close the progressbar
